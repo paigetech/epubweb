@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://www.idpf.org/2007/opf" version="3.0" xml:lang="en" dir="ltr" unique-identifier="bookid">
+	<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+		<meta property="dcterms:modified">2014-11-21T10:44:16Z</meta>
+		<meta name="cover" content="cover-image" />
+		<dc:language>en-US</dc:language>
+		<dc:title id="title01">The Peoples E-Book</dc:title>
+		<dc:identifier id="bookid">urn:uuid:a9339093-4dba-5133-b354-6a66336d9f70</dc:identifier>
+		<dc:date>2014-11-15</dc:date>
+    	
+		
+	</metadata>	
+	<manifest>
+		<item id="asset_1" href="assets/large_1.png" media-type="image/png" />
+		<item id="asset_2" href="assets/large_2.png" media-type="image/png" />
+		<item id="cover-image" href="assets/800" media-type="image/jpeg" properties="cover-image"/>
+		<item id="asset_4" href="assets/large_4.png" media-type="image/png" />
+		<item id="asset_5" href="assets/large_3.png" media-type="image/png" />
+		<item id="asset_6" href="assets/large.png" media-type="image/png" />
+		<item id="asset_7" href="assets/large_9.png" media-type="image/png" />
+		<item id="asset_8" href="assets/large_7.png" media-type="image/png" />
+		<item id="asset_9" href="assets/large_6.png" media-type="image/png" />
+		<item id="asset_10" href="assets/large_8.png" media-type="image/png" />
+		<item id="asset_11" href="assets/large_5.png" media-type="image/png" />
+		<item id="asset_12" href="assets/large_11.png" media-type="image/png" />
+		<item id="asset_13" href="assets/large_10.png" media-type="image/png" />
+		<item id="asset_14" href="assets/large_13.png" media-type="image/png" />
+		<item id="asset_15" href="assets/large_12.png" media-type="image/png" />
+		<item id="asset_16" href="assets/large_14.png" media-type="image/png" />
+		<item id="asset_17" href="assets/large_15.png" media-type="image/png" />
+		<item id="asset_18" href="assets/large_16.png" media-type="image/png" />
+		<item id="asset_19" href="assets/large_18.png" media-type="image/png" />
+		<item id="asset_20" href="assets/large_17.png" media-type="image/png" />
+		<item id="asset_21" href="assets/large_19.png" media-type="image/png" />
+		<item id="asset_22" href="assets/large_21.png" media-type="image/png" />
+		<item id="asset_23" href="assets/large_20.png" media-type="image/png" />
+		<item id="asset_24" href="assets/large_22.png" media-type="image/png" />
+		<item id="asset_25" href="assets/large_23.png" media-type="image/png" />
+		<item id="asset_26" href="assets/large_24.png" media-type="image/png" />
+		<item id="asset_27" href="assets/large_25.png" media-type="image/png" />
+		<item id="asset_28" href="assets/large_26.png" media-type="image/png" />
+		<item id="asset_29" href="assets/large_29.png" media-type="image/png" />
+		<item id="asset_30" href="assets/large_28.png" media-type="image/png" />
+		<item id="asset_31" href="assets/large_30.png" media-type="image/png" />
+		<item id="asset_32" href="assets/large_27.png" media-type="image/png" />
+		<item id="asset_33" href="assets/large_31.png" media-type="image/png" />
+		<item id="asset_34" href="assets/large_32.png" media-type="image/png" />
+		<item id="asset_35" href="assets/large_33.png" media-type="image/png" />
+		<item id="asset_36" href="assets/large_34.png" media-type="image/png" />
+		<item id="asset_37" href="assets/large_35.png" media-type="image/png" />
+		<item id="asset_38" href="assets/large_36.png" media-type="image/png" />
+		<item id="asset_39" href="assets/large_37.png" media-type="image/png" />
+		<item id="asset_40" href="assets/large_39.png" media-type="image/png" />
+		<item id="asset_41" href="assets/large_38.png" media-type="image/png" />
+		<item id="asset_42" href="assets/large_40.png" media-type="image/png" />
+		<item id="asset_43" href="assets/large_41.png" media-type="image/png" />
+		<item id="asset_44" href="assets/large_43.png" media-type="image/png" />
+		<item id="asset_45" href="assets/large_44.png" media-type="image/png" />
+		<item id="asset_46" href="assets/large_42.png" media-type="image/png" />
+		<item id="asset_47" href="assets/large_45.png" media-type="image/png" />
+		<item id="asset_48" href="assets/large_46.png" media-type="image/png" />
+		<item id="asset_49" href="assets/large_48.png" media-type="image/png" />
+		<item id="asset_50" href="assets/large_47.png" media-type="image/png" />
+		<item id="asset_51" href="assets/large_49.png" media-type="image/png" />
+		<item id="asset_52" href="assets/large_51.png" media-type="image/png" />
+		<item id="asset_53" href="assets/large_50.png" media-type="image/png" />
+		<item id="asset_54" href="assets/large_52.png" media-type="image/png" />
+		<item id="asset_55" href="assets/large_53.png" media-type="image/png" />
+		<item id="asset_56" href="assets/large_55.png" media-type="image/png" />
+		<item id="asset_57" href="assets/large_56.png" media-type="image/png" />
+		<item id="asset_58" href="assets/large_54.png" media-type="image/png" />
+		<item id="asset_59" href="assets/large_58.png" media-type="image/png" />
+		<item id="asset_60" href="assets/large_60.png" media-type="image/png" />
+		<item id="asset_61" href="assets/large_59.png" media-type="image/png" />
+		<item id="asset_62" href="assets/large_57.png" media-type="image/png" />
+		<item id="asset_63" href="assets/large_61.png" media-type="image/png" />
+		<item id="asset_64" href="assets/large_63.png" media-type="image/png" />
+		<item id="asset_65" href="assets/large_62.png" media-type="image/png" />
+		<item id="asset_66" href="assets/large_64.png" media-type="image/png" />
+		<item id="asset_67" href="assets/large_65.png" media-type="image/png" />
+		<item id="asset_68" href="assets/large_66.png" media-type="image/png" />
+		<item id="asset_69" href="assets/large_67.png" media-type="image/png" />
+		<item id="asset_70" href="assets/large_68.png" media-type="image/png" />
+		<item id="asset_71" href="assets/large_69.png" media-type="image/png" />
+		<item id="asset_72" href="assets/large_70.png" media-type="image/png" />
+		<item id="asset_73" href="assets/large_71.png" media-type="image/png" />
+		<item id="asset_74" href="assets/large_74.png" media-type="image/png" />
+		<item id="asset_75" href="assets/large_73.png" media-type="image/png" />
+		<item id="asset_76" href="assets/large_75.png" media-type="image/png" />
+		<item id="asset_77" href="assets/large_72.png" media-type="image/png" />
+		<item id="asset_78" href="assets/large_76.png" media-type="image/png" />
+		<item id="asset_79" href="assets/large_77.png" media-type="image/png" />
+		<item id="asset_80" href="assets/large_78.png" media-type="image/png" />
+		<item id="asset_81" href="assets/large_79.png" media-type="image/png" />
+		<item id="asset_82" href="assets/large_80.png" media-type="image/png" />
+		<item id="asset_83" href="assets/large_81.png" media-type="image/png" />
+		<item id="asset_84" href="assets/large_84.png" media-type="image/png" />
+		<item id="asset_85" href="assets/large_83.png" media-type="image/png" />
+		<item id="asset_86" href="assets/large_82.png" media-type="image/png" />
+		<item id="asset_87" href="assets/large_85.png" media-type="image/png" />
+		<item id="asset_88" href="assets/large_86.png" media-type="image/png" />
+		<item id="asset_89" href="assets/large_89.png" media-type="image/png" />
+		<item id="asset_90" href="assets/large_88.png" media-type="image/png" />
+		<item id="asset_91" href="assets/large_87.png" media-type="image/png" />
+		<item id="asset_92" href="assets/large_90.png" media-type="image/png" />
+		<item id="asset_93" href="assets/large_91.png" media-type="image/png" />
+		<item id="asset_94" href="assets/large_94.png" media-type="image/png" />
+		<item id="asset_95" href="assets/large_92.png" media-type="image/png" />
+		<item id="asset_96" href="assets/large_93.png" media-type="image/png" />
+		<item id="asset_97" href="assets/large_95.png" media-type="image/png" />
+		<item id="asset_98" href="assets/large_96.png" media-type="image/png" />
+		<item id="asset_99" href="assets/large_98.png" media-type="image/png" />
+		<item id="asset_100" href="assets/large_97.png" media-type="image/png" />
+		<item id="asset_101" href="assets/large_100.png" media-type="image/png" />
+		<item id="asset_102" href="assets/large_99.png" media-type="image/png" />
+		<item id="asset_103" href="assets/large_103.png" media-type="image/png" />
+		<item id="asset_104" href="assets/large_101.png" media-type="image/png" />
+		<item id="asset_105" href="assets/large_105.png" media-type="image/png" />
+		<item id="asset_106" href="assets/large_104.png" media-type="image/png" />
+		<item id="asset_107" href="assets/large_102.png" media-type="image/png" />
+		<item id="asset_108" href="assets/large_106.png" media-type="image/png" />
+		<item id="asset_109" href="assets/large_107.png" media-type="image/png" />
+		<item id="asset_110" href="assets/large_108.png" media-type="image/png" />
+		<item id="asset_111" href="assets/large_110.png" media-type="image/png" />
+		<item id="asset_112" href="assets/large_109.png" media-type="image/png" />
+		<item id="asset_113" href="assets/large_111.png" media-type="image/png" />
+		<item id="e00000" href="e00000.html" media-type="application/xhtml+xml" />
+		<item id="toc" href="toc.html" media-type="application/xhtml+xml" properties="nav"/>
+		<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />
+	</manifest>
+	<spine toc="ncx">
+		<itemref idref="e00000" />
+	</spine>	
+</package>

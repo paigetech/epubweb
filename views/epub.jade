@@ -1,0 +1,17 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+  form( method="post")
+    div
+      label URL
+      input(type="text", name="url", id="url" value= url)
+    div
+      label Div
+      input(type="text", name="div", id="div" value= div)
+    div
+      label File Name
+      input(type="text", name="fileName", id="fileName" value= fileName)
+    div
+      input(type="submit", value="Submit")
