@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
+  <head>
+    <meta name="dtb:uid" content="urn:uuid:8e8da416-29ca-b013-c390-fdbef44cc07c"/>
+  </head>
+  <docTitle>
+    <text>The Peoples E-Book</text>
+  </docTitle>
+  <navMap>
+    <navPoint id="navPoint-1" playOrder="1" class="chapter">   
+  		<navLabel><text>The Peoples E-Book</text></navLabel>
+		  <content src="e00000.html"/>    
+    </navPoint>  
+</navMap>
+</ncx>
+<!-- Created with pe-epub at http://thepeoplesebook.net -->
