@@ -23,15 +23,14 @@ function doIt(){
   var fileName = 'public/temp.html';
 
   request(url, function(error, response, html){
-//  fs.readFile(fileName, function(error, html){
     if(!error) {
       var $ = cheerio.load(html);
       var source = $('.article').html();
 
       //building the doc
       var doc = "";
-      var uid = "uid";
-      var date = "date";
+      var uid = "uid"; //need to set up
+      var date = "date"; //need to set up
       var today = dateNow();
 
       //sumary and preface
@@ -49,15 +48,11 @@ function doIt(){
         var index = "";
 
         //CFRs
-        var cfrIndexSource = $('dl #metadata_list').html();
-        var re = /(\d\d\sCFR\d+)<\/a>/g;
-        while( (res = re.exec(inputIndexSource)) !== null ){
-          matches.push(res[1]);
-        }
-        matches.forEach(function(item) {
-          item.replace(/-/, "");
-          index = index + ":::index " + item + "\n";
-        });
+        var cfrIndexSource = $('.aside_box dl').html();
+        var re = /(\d\d\sCFR\s\d+)/g;
+        var CFR = cfrIndexSource.match(re); //so we can use it later
+        matches = CFR;
+
 
         //input
         var inputIndexSource = $('#related_topics').html();
@@ -65,14 +60,17 @@ function doIt(){
         while( (res = re.exec(inputIndexSource)) !== null ){
           matches.push(res[1]);
         }
+
+        //build the :::index
         matches.forEach(function(item) {
-          item.replace(/-/, "");
+          item = item.replace(/[-\s]/g, "");
           index = index + ":::index " + item + "\n";
         });
         doc = doc + '\n' + index;
 
         //title
-        var title = '<p><b>' + $('div[id=metadata_content_area]').html() + '</b></p>\n';
+        var header = $('#metadata_content_area h1').html();
+        var title = '<p><b>' + header + '</b></p>\n';
 
         doc = doc + '\n' + title;
 
