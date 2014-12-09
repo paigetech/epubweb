@@ -13,6 +13,9 @@ var dateNow = function() {
   var monthSingleDigit = dateNow.getMonth() + 1,
   mm = monthSingleDigit < 10 ? '0' + monthSingleDigit : monthSingleDigit;
   var yy = dateNow.getFullYear().toString();
+  if (dd < 10) {
+    dd = "0" + dd;
+  };
   return (yy + '-' + mm + '-' + dd);
 };
 
@@ -52,7 +55,7 @@ function doIt(){
       var header = "<doc>\n" +
         ":::uid " + uid + "\n" +
         ":::date " + date + "\n" +
-        ":::wn " + today + "0\n" +
+        ":::wn " + today + "\n" +
         "<h3>Summary and Preface</h3>\n" +
         "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/globaltext.css\"> \n" +
         "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/fedreg.css\">\n";
@@ -192,19 +195,19 @@ function doIt(){
         doc += "<br><p><b>Shorter URL:</b> <a href=\"" + shortURL +"\">" + shortURL + "</a></p>";
 
         //Find the TOC so that we can remove it while saving it for later
-        var toc = $('#content_area #table_of_contents').html();
-        toc += $('#content_area .table_of_contents').html();
-
-        var tables = $('#content_area #table_of_tables').html();
-        tables += $('#content_area .table_of_tables').html();
-        //remove the TOC and table of tables
-        $('#content_area .table_of_contents').remove();
-        $('#content_area #table_of_contents').remove();
-        $('#content_area .table_of_tables').remove();
-        $('#content_area #table_of_tables').remove();
-
-        //this is in the wrong stinking place
-        doc += "\n<\/doc>\n<doc>\n:::uid tableofcontents\n<h3>Table of Contents</h3>" + toc + "\n<\/doc>";
+//        var toc = $('#content_area #table_of_contents').html();
+//      toc += $('#content_area .table_of_contents').html();
+//
+//      var tables = $('#content_area #table_of_tables').html();
+//      tables += $('#content_area .table_of_tables').html();
+//      //remove the TOC and table of tables
+//      $('#content_area .table_of_contents').remove();
+//      $('#content_area #table_of_contents').remove();
+//      $('#content_area .table_of_tables').remove();
+//      $('#content_area #table_of_tables').remove();
+//
+//      //this is in the wrong stinking place
+//      doc += "\n<\/doc>\n<doc>\n:::uid tableofcontents\n<h3>Table of Contents</h3>" + toc + "\n<\/doc>";
 
         //body info for the rest of the build
         var body = $('#content_area').html();
@@ -215,6 +218,13 @@ function doIt(){
         
         //get rid of divs
         re = /<\/?div[\S\s]*?>/g;
+        body = body.replace(re, "");
+
+        //get rid of "back to context"
+        re = /<a[\S\s]*?>Back to Context([\n\s]+)?<\/a>\n?/g;
+        body = body.replace(re, "");
+        //get rid of "back to top"
+        re = /<a[\S\s]*?>Back to Top([\n\s]+)?<\/a>\n?/g;
         body = body.replace(re, "");
 
         //get rid of h1s
@@ -270,16 +280,14 @@ function doIt(){
         re = /href=\"#/g;
         body = body.replace(re, "name=\"#");
 
-        //get rid of "back to context"
-        re = /<a\sclass="back"[\S\s]*?>[\n\s]+Back to Context[\n\s]+<\/a>/g;
-        body = body.replace(re, "");
-        //get rid of "back to top"
-        re = /<a\sclass="back_to_top"[\S\s]*?>[\n\s]+?Back to Top[\n\s]+?<\/a>/g;
-        body = body.replace(re, "");
 
         doc += body;
+        //fix uids
+        re = /(:::uid\s[\w\d]+)\-([\w\d]+)/g;
+        doc = doc.replace(re, "$1$2"); 
 
         doc += "\n<\/doc>";
+        console.log("This is the doc" + doc);
 
         //what is in the doc now
         fs.writeFileSync("xpathTest.html", doc);
