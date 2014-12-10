@@ -56,7 +56,7 @@ function doIt(){
         ":::uid " + uid + "\n" +
         ":::date " + date + "\n" +
         ":::wn " + today + "\n" +
-        "<h3>Summary and Preface</h3>\n" +
+        "<h3 id=\"summary_and_preface\">Summary and Preface</h3>\n" +
         "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/globaltext.css\"> \n" +
         "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/fedreg.css\">\n";
         doc = header;
@@ -200,11 +200,11 @@ function doIt(){
 //
 //      var tables = $('#content_area #table_of_tables').html();
 //      tables += $('#content_area .table_of_tables').html();
-//      //remove the TOC and table of tables
-//      $('#content_area .table_of_contents').remove();
-//      $('#content_area #table_of_contents').remove();
-//      $('#content_area .table_of_tables').remove();
-//      $('#content_area #table_of_tables').remove();
+      //remove the TOC and table of tables
+      $('#content_area .table_of_contents').remove();
+      $('#content_area #table_of_contents').remove();
+      $('#content_area .table_of_tables').remove();
+      $('#content_area #table_of_tables').remove();
 //
 //      //this is in the wrong stinking place
 //      doc += "\n<\/doc>\n<doc>\n:::uid tableofcontents\n<h3>Table of Contents</h3>" + toc + "\n<\/doc>";
@@ -215,16 +215,15 @@ function doIt(){
         //adding indexs and alinks
         re = /<span\sclass="printed_page"\sid="page-(\d+)[\S\s]*?<\/span>/g;
         body = body.replace(re, "\n:::index 79p$1\n<a name=\"79p$1\"><\/a>\n");
-        
-        //get rid of divs
-        re = /<\/?div[\S\s]*?>/g;
+
+        //getting rid of back to top
+        re = /<a href="[#_\w]+"\sclass="back_to_top">Back to Top<\/a>/g;
         body = body.replace(re, "");
 
-        //get rid of "back to context"
-        re = /<a[\S\s]*?>Back to Context([\n\s]+)?<\/a>\n?/g;
+        //get rid of divs
+        re = /<div\s[\w="_\s]+>/g;
         body = body.replace(re, "");
-        //get rid of "back to top"
-        re = /<a[\S\s]*?>Back to Top([\n\s]+)?<\/a>\n?/g;
+        re = /<\/div>/g;
         body = body.replace(re, "");
 
         //get rid of h1s
@@ -243,27 +242,42 @@ function doIt(){
 
         //get rid of the plain h3s
         re = /<h3>([\S\s]*?)<\/h3>/g;
-        body = body.replace(re, "<br><p><b>$1<\/b><\/p>\n");
+        body = body.replace(re, "<p><b>$1<\/b><\/p>\n");
 
 
         //h3s -> h4s for docs
         re = /<h3[\S\s]*?id=\"\w\-(\d+)\"[\S\s]*?>/g;
-        var replace = "\n<\/doc>\n<doc>\n:::date " + date + "\n:::uid " + uid + "$1\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/globaltext.css\">\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/fedreg.css\">\n<h4><a name=\"$1\"><\/a>";
+        replace = "\n<\/doc>\n<doc>\n:::date " + date + "\n:::uid " + uid + "$1\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/globaltext.css\">\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/fedreg.css\">\n<h4><a name=\"$1\"><\/a>";
         body = body.replace(re, replace);
         re = /<\/h3>/g;
         body = body.replace(re, "<\/h4>\n");
 
-        re = /<h2\sid="([\w\d_\-]+)"[\S\s]*?>([IVX]\.[\S\s]*?)<\/h2>/g;
-        replace = "\n<\/doc>\n<doc>\n:::uid " + uid + "$1\n<h3>$2<\/h3>\n";
-        body = body.replace(re, replace);
-        //pull the anchors out of headers
-        re = /(<h3>[\S\s]*?)<a[\S\s]*?<\/a>/g;
-        replace = "$1";
-        body = body.replace(re, replace);
-
         //look for h3's that should be docs in their own right
         re = /<doc>\n:::uid\s([\w\d]+)\n<h3>([IVX]+\.)([\w\d\s\.\-\:\(\)\\\/]+)<\/h3>[\n\s]+?<p/g;
-        replace = "\n<\/doc>\n<doc>\n:::uid " + uid + "$1\n<h3>$2$3<\/h3>\n\n<\/doc>\n<doc>\n:::date " + date + "\n:::uid $1\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/globaltext.css\">\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/fedreg.css\">\n<h4>$3<\/h4>\n<p";
+        replace = "\n<\/doc>\n<doc>\n:::uid " + uid + "head$1\n<h3>$2$3<\/h3>\n\n<\/doc>\n<doc>\n:::date " + date + "\n:::uid $1\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/globaltext.css\">\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/fedreg.css\">\n<h4>$3<\/h4>\n<p";
+        body = body.replace(re, replace);
+
+        //catpture the important h2s
+        re = /<h2\sid=\"([\w\d\"\-\s=]+)\"[\w\d\"\-\s=]+\">([IVX]+\.[\S\s]*?)<\/h2>/g;
+        replace = "\n<\/doc>\n<doc>\n:::uid " + uid + "$1\n<h3>$2<\/h3>\n";
+        body = body.replace(re, replace);
+        //get rid of the others
+        re = /<h2\sid=\"([\w\d\"\-\s=]+)\"[\w\d\"\-\s=]+\">([\S\s]*?)<\/h2>/g;
+        replace = "\n<p><b>$2<\/b><\/p>\n";
+        body = body.replace(re, replace);
+
+
+        //setup for Footnotes
+        re = /<p><b>Footnotes/g;
+        replace = "\n<\/doc>\n<doc>\n:::date " + date +  "\n:::uid " + uid + "footnotes\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/globaltext.css\">\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/fedreg.css\">\n<h3>Footnotes<\/h3>\n";
+        body = body.replace(re, replace);
+        re = /<div[\s\w\d=_\-\"]+class="footnote">/g;
+        replace = "";
+        body = body.replace(re, replace);
+
+        //setup for List of Subjects
+        re = /<p><b>List of Subjects/g;
+        replace = "\n<\/doc>\n<doc>\n:::uid " + uid + "headlistofsubject\n<h3>List of Subjects<\/h3>\n\n<\/doc>\n<doc>\n:::date " + date +  "\n:::uid " + uid + "listofsubjects\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/globaltext.css\">\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/fedreg.css\">\n<h4>List of Subjects<\/h4>\n";
         body = body.replace(re, replace);
 
         //clean up the rest of the h's
@@ -272,13 +286,29 @@ function doIt(){
         re = /<\/h5>/g;
         body = body.replace(re, "<\/b><\/p>");
 
+        //setup the PARTS
+        re = /<p><b>(PART\s(\d+)[\S\s]*?)<\/b><\/p>/g;
+        replace = "\n<\/doc>\n<doc>\n:::date " + date + "\n:::uid " + uid + "part$2\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/globaltext.css\">\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/fedreg.css\">\n<h4>$1<\/h4>";
+        body = body.replace(re, replace);
+
         //clean up double end docs
         re = /<\/doc>\n+<\/doc>/g;
         body = body.replace(re, "<\/doc>");
 
-        //replace the hrefs that should be named anchors
-        re = /href=\"#/g;
-        body = body.replace(re, "name=\"#");
+        //clean up random h2
+        re = /<h2([\s\w\d=\"_]+)?><\/h2>/g;
+        body = body.replace(re, "");
+
+        //get rid of "back to context"
+//        re = /<a[\S\s]*?>Back to Context([\n\s]+)?<\/a>/g;
+//      body = body.replace(re, "");
+//      //get rid of "back to top"
+//      re = /<a[\S\s]*?>Back to Top([\n\s]+)?<\/a>/g;
+//      body = body.replace(re, "");
+//
+//      //get rid of "back to top"
+//      re = /\n<\/h(\d)>/g;
+//      body = body.replace(re, "<\/h$1>");
 
 
         doc += body;
