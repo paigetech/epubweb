@@ -32,7 +32,8 @@ function doIt(){
   //PFS
   //var url = "https://www.federalregister.gov/articles/2014/11/13/2014-26183/medicare-program-revisions-to-payment-policies-under-the-physician-fee-schedule-clinical-laboratory";
   console.log("Downloading URL: " + url);
-  var fileName = 'public/temp.html';
+  //write out what we're pulling down for testing purposes
+  fs.writeFileSync("origional.html", url);
 
   request(url, function(error, response, html){
     if(!error) {
@@ -44,9 +45,8 @@ function doIt(){
 
       //building the doc
       var doc = "";
+
       //H2
-
-
       //body Summary and Preface
       //uid
       var uid = FRVolume + "FR" + edition; //need to set up
@@ -214,7 +214,7 @@ function doIt(){
 
         doc += "<br><p><b>Shorter URL:</b> <a href=\"" + shortURL +"\">" + shortURL + "</a></p>";
 
-        //Find the TOC so that we can remove it while saving it for later
+      //Find the TOC so that we can remove it while saving it for later
       var toc = $('#content_area #table_of_contents').html();
       toc += $('#content_area .table_of_contents').html();
 
@@ -225,6 +225,8 @@ function doIt(){
       $('#content_area #table_of_contents').remove();
       $('#content_area .table_of_tables').remove();
       $('#content_area #table_of_tables').remove();
+      //remove the secondary ToC
+      $('#content_area .extract').remove();
 
       //this is in the wrong stinking place
       var tableOfContents = "\n<doc>\n:::uid tableofcontents" + FRVolume + "\n<h3>Table of Contents</h3>" + toc + "\n<\/doc>";
@@ -236,12 +238,6 @@ function doIt(){
       tableOfContents = tableOfContents.replace(re, "<p ");
       re = /<\/li>/g;
       tableOfContents = tableOfContents.replace(re, "<\/p>");
-
-      //change the a links into uids
-      re = /<a\shref=\"#(\w+)-(\d+)\">/g;
-      //replace = "<!!uf " + collection + " " + FRVolume + edition + "$1$2\">";
-      replace = "<a href=\"" + FRVolume + edition + "$1$2\"><\/a>";
-      tableOfContents = tableOfContents.replace(re, replace);
 
       //body info for the rest of the build
       var body = $('#content_area').html();
@@ -261,16 +257,16 @@ function doIt(){
       body = body.replace(re, "");
 
       //get rid of h1s
-      re = /<h1[\S\s]*?>/g;
-      body = body.replace(re, "<br><br><p><b>");
+      re = /<h1[\S\s]*?id=\"(\w\-\d+)\"[\S\s]*?>/g;
+      body = body.replace(re, "<br><br><a name=\"$1\"><\/a><p>");
       re = /<\/h1>/g;
       body = body.replace(re, "<\/b><\/p>");
 
       //setup the different docs
 
       //first get rid of the h4s we don't want
-      re = /<h4[\S\s]*?>/g;
-      body = body.replace(re, "<br><p><b>");
+      re = /<h4[\S\s]*?id=\"(\w\-\d+)\"[\S\s]*?>/g;
+      body = body.replace(re, "<a name=\"$1\"><\/a><br><p><b>");
       re = /<\/h4>/g;
       body = body.replace(re, "<\/b><\/p>");
 
@@ -293,11 +289,11 @@ function doIt(){
 
       //catpture the important h2s
       re = /<h2\sid=\"([\w\d\"\-\s=]+)\"[\w\d\"\-\s=]+\">([IVX]+\.[\S\s]*?)<\/h2>/g;
-      replace = "\n<\/doc>\n<doc>\n:::uid " + uid + "$1\n<h3>$2<\/h3>\n";
+      replace = "\n<\/doc>\n<doc>\n:::uid " + uid + "$1\n<h3>$2<\/h3>\n<a name=\"$1\"><\/a>\n";
       body = body.replace(re, replace);
       //get rid of the others
       re = /<h2\sid=\"([\w\d\"\-\s=]+)\"[\w\d\"\-\s=]+\">([\S\s]*?)<\/h2>/g;
-      replace = "\n<p><b>$2<\/b><\/p>\n";
+      replace = "\n<p><b>$2<\/b><\/p>\n<a name=\"$1\"><\/a>\n";
       body = body.replace(re, replace);
 
 
@@ -360,9 +356,9 @@ function doIt(){
       doc = doc.replace(re, "");
 
       //change the alinks in headers
-      re = /(<h\d>)<a\sname=\"(\w)-(\d+)\"><\/a>([\S\s]*?<\/h\d>)/g;
-      replace = "$1$4\n<a name=\"" + FRVolume + edition + "$2$3\"><\/a>";
-      doc = doc.replace(re, replace);
+      //re = /(<h\d>)<a\sname=\"(\w)-(\d+)\"><\/a>([\S\s]*?<\/h\d>)/g;
+      //replace = "$1$4\n<a name=\"" + FRVolume + edition + "$2$3\"><\/a>";
+      //doc = doc.replace(re, replace);
 
       //header id removal
       re = /(<h\d)\s[\w\s\d=\"]+>/g;
