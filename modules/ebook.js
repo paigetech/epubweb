@@ -242,6 +242,9 @@ function doIt(){
       //body info for the rest of the build
       var body = $('#content_area').html();
 
+      //what is in the doc now
+      fs.writeFileSync("body.html", body);
+
       //adding indexs and alinks
       re = /<span\sclass="printed_page"\sid="page-(\d+)[\S\s]*?<\/span>/g;
       body = body.replace(re, "\n:::index 79p$1\n<a name=\"79p$1\"><\/a>\n");
@@ -289,6 +292,7 @@ function doIt(){
 
       //catpture the important h2s
       re = /<h2\sid=\"([\w\d\"\-\s=]+)\"[\w\d\"\-\s=]+\">([IVX]+\.[\S\s]*?)<\/h2>/g;
+
       replace = "\n<\/doc>\n<doc>\n:::uid " + uid + "$1\n<h3>$2<\/h3>\n<a name=\"$1\"><\/a>\n";
       body = body.replace(re, replace);
       //get rid of the others
