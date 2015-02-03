@@ -19,7 +19,7 @@ var dateNow = function() {
   return (yy + '-' + mm + '-' + dd);
 };
 
-function doIt(){
+function doIt(url, articleName){
 
   //var collection = "mre_paige_test";
   //opps
@@ -27,7 +27,7 @@ function doIt(){
   //pfs
   //var collection = "mre_pps_pfs2015";
 
-  var url = "https://www.federalregister.gov/articles/2010/12/30/2010-33169/recruiting-and-hiring-students-and-recent-graduates";
+  //var url = "https://www.federalregister.gov/articles/2010/12/30/2010-33169/recruiting-and-hiring-students-and-recent-graduates";
 
   console.log("Downloading URL: " + url);
   //write out what we're pulling down for testing purposes
@@ -153,12 +153,84 @@ function doIt(){
       console.log("Done");
 
       //what is in the doc now
-      fs.writeFileSync("missingTest.html", doc);
+      fs.writeFileSync( articleName, doc );
       //console.log(doc);
   }
 });
 
 }
 
-doIt();
+var missing = [
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30451/semiannual-regulatory-agenda-fall-2010",
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30450/fall-2010-semiannual-agenda-of-regulations",
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30443/improving-government-regulations-unified-agenda-of-federal-regulatory-and-deregulatory-actions",
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30472/semiannual-regulatory-agenda",
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30454/unified-agenda-of-federal-regulatory-and-deregulatory-actions",
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30457/regulatory-agenda",
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30459/fall-2010-regulatory-agenda",
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30463/unified-agenda-of-federal-regulatory-and-deregulatory-actions-fall-2010",
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30465/fall-2010-unified-agenda",
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30471/semiannual-regulatory-flexibility-agenda",
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30466/semiannual-regulatory-agenda",
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30467/unified-agenda-of-federal-regulatory-and-deregulatory-actions",
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30444/regulatory-agenda",
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30453/unified-agenda-of-federal-regulatory-and-deregulatory-actions",
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30449/semiannual-regulatory-agenda",
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30440/regulatory-agenda",
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30442/semiannual-agenda-of-regulations",
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30468/unified-agenda-of-federal-regulatory-and-deregulatory-actions",
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30469/regulatory-flexibility-agenda",
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30470/semiannual-regulatory-agenda",
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30462/department-regulatory-agenda-semiannual-summary",
+  "https://www.federalregister.gov/articles/2010/12/20/2010-30452/semiannual-agenda-and-fiscal-year-2011-regulatory-plan",
+  "https://www.federalregister.gov/articles/2010/07/30/2010-18988/increasing-federal-employment-of-individuals-with-disabilities",
+  "https://www.federalregister.gov/articles/2014/12/22/2014-28974/unified-agenda-of-federal-regulatory-and-deregulatory-actions",
+  "https://www.federalregister.gov/articles/2014/12/22/2014-28985/regulatory-flexibility-agenda",
+  "https://www.federalregister.gov/articles/2014/12/22/2014-28987/semiannual-regulatory-agenda",
+  "https://www.federalregister.gov/articles/2014/12/22/2014-28984/semiannual-regulatory-agenda",
+  "https://www.federalregister.gov/articles/2014/12/22/2014-28976/fall-2014-regulatory-agenda",
+  "https://www.federalregister.gov/articles/2014/12/22/2014-28989/unified-agenda-of-federal-regulatory-and-deregulatory-actions-fall-2014",
+  "https://www.federalregister.gov/articles/2014/12/22/2014-28990/semiannual-regulatory-flexibility-agenda",
+  "https://www.federalregister.gov/articles/2014/12/22/2014-28977/unified-agenda-of-federal-regulatory-and-deregulatory-actions",
+  "https://www.federalregister.gov/articles/2014/12/22/2014-28968/semiannual-regulatory-agenda",
+  "https://www.federalregister.gov/articles/2014/12/22/2014-28981/regulatory-agenda",
+  "https://www.federalregister.gov/articles/2014/12/22/2014-28971/semiannual-agenda-of-regulations",
+  "https://www.federalregister.gov/articles/2014/12/22/2014-28982/regulatory-agenda",
+  "https://www.federalregister.gov/articles/2014/12/22/2014-28992/unified-agenda-of-federal-regulatory-and-deregulatory-actions",
+  "https://www.federalregister.gov/articles/2014/12/22/2014-28993/regulatory-flexibility-agenda",
+  "https://www.federalregister.gov/articles/2014/12/22/2014-28983/semiannual-regulatory-agenda",
+  "https://www.federalregister.gov/articles/2014/12/22/2014-28995/semiannual-regulatory-agenda",
+  "https://www.federalregister.gov/articles/2014/12/22/2014-29407/department-regulatory-agenda-semiannual-summary",
+  "https://www.federalregister.gov/articles/2014/06/13/2014-13129/unified-agenda-of-federal-regulatory-and-deregulatory-actions",
+  "https://www.federalregister.gov/articles/2014/06/13/2014-13135/semiannual-regulatory-agenda",
+  "https://www.federalregister.gov/articles/2014/06/13/2014-13136/semiannual-regulatory-agenda",
+  "https://www.federalregister.gov/articles/2014/06/13/2014-13134/semiannual-regulatory-agenda",
+  "https://www.federalregister.gov/articles/2014/06/13/2014-13130/spring-2014-regulatory-agenda",
+  "https://www.federalregister.gov/articles/2014/06/13/2014-13137/unified-agenda-of-federal-regulatory-and-deregulatory-actions-spring-2014",
+  "https://www.federalregister.gov/articles/2014/06/13/2014-13139/semiannual-agenda-of-regulations",
+  "https://www.federalregister.gov/articles/2014/06/13/2014-13141/semiannual-regulatory-flexibility-agenda",
+  "https://www.federalregister.gov/articles/2014/06/13/2014-13131/unified-agenda-of-federal-regulatory-and-deregulatory-actions",
+  "https://www.federalregister.gov/articles/2014/06/13/2014-13123/semiannual-regulatory-agenda",
+  "https://www.federalregister.gov/articles/2014/06/13/2014-13124/regulatory-agenda",
+  "https://www.federalregister.gov/articles/2014/06/13/2014-13126/semiannual-agenda-of-regulations",
+  "https://www.federalregister.gov/articles/2014/06/13/2014-13132/regulatory-agenda",
+  "https://www.federalregister.gov/articles/2014/06/13/2014-13143/unified-agenda-of-federal-regulatory-and-deregulatory-actions",
+  "https://www.federalregister.gov/articles/2014/06/13/2014-13146/regulatory-flexibility-agenda",
+  "https://www.federalregister.gov/articles/2014/06/13/2014-13133/semiannual-regulatory-agenda",
+  "https://www.federalregister.gov/articles/2014/06/13/2014-13127/department-regulatory-agenda-semiannual-summary",
+  "https://www.federalregister.gov/articles/2014/06/13/2014-13128/semiannual-agenda"
+  ];
+
+//  missing.forEach(function(value, index) { 
+//    var articleName = /(20\d\d-\d+)/.exec(value);
+//    articleName = articleName[1].toString() + ".html";
+//    if (!articleName) {
+//      console.log("Error with: " + url);
+//    } else {
+//      doIt(value, articleName);
+//    }
+//  });
+
+//doIt("https://www.federalregister.gov/articles/2014/06/13/2014-13128/semiannual-agenda", "runTest.html");
+
 
