@@ -22,14 +22,13 @@ var dateNow = function() {
 
 function doIt(){
 
-  //var collection = "mre_paige_test";
   //opps
-  //var collection = "mre_pps_outpt2015";
+  var collection = "mre_pps_outpt2015";
   //OPPS
-  //var url = "https://www.federalregister.gov/articles/2014/11/10/2014-26146/medicare-and-medicaid-programs-hospital-outpatient-prospective-payment-and-ambulatory-surgical";
+  var url = "https://www.federalregister.gov/articles/2014/11/10/2014-26146/medicare-and-medicaid-programs-hospital-outpatient-prospective-payment-and-ambulatory-surgical";
   //pfs
-  var collection = "mre_pps_pfs2015";
-  var url = "https://www.federalregister.gov/articles/2014/11/13/2014-26183/medicare-program-revisions-to-payment-policies-under-the-physician-fee-schedule-clinical-laboratory";
+  //var collection = "mre_pps_pfs2015";
+  //var url = "https://www.federalregister.gov/articles/2014/11/13/2014-26183/medicare-program-revisions-to-payment-policies-under-the-physician-fee-schedule-clinical-laboratory";
 
   console.log("Downloading For: " + collection + " URL:" + url);
   //write out what we're pulling down for testing purposes
@@ -228,7 +227,7 @@ function doIt(){
       //$('#content_area .extract').remove();
 
       //this is in the wrong stinking place
-      var tableOfContents = "\n<doc>\n:::uid tableofcontents" + FRVolume + "\n<h3>Table of Contents</h3>" + toc + "\n<\/doc>";
+      var tableOfContents = "\n<doc>\n:::uid tableofcontents" + FRVolume + "\n<h3>Table of Contents</h3>\n<a name=\"table_of_contents\"></a>" + toc + "\n<\/doc>";
       //remove the awkward Back to Top
       re = /Table of Contents <a href="#table_of_contents" class="back_to_top">Back to Top<\/a>/g;
       tableOfContents = tableOfContents.replace(re, "");
@@ -241,9 +240,6 @@ function doIt(){
       //body info for the rest of the build
       var body = $('#content_area').html();
 
-      //what is in the doc now
-      fs.writeFileSync("body.html", body);
-
       //adding indexs and alinks
       re = /<span\sclass="printed_page"\sid="page-(\d+)[\S\s]*?<\/span>/g;
       body = body.replace(re, "\n:::index 79p$1\n<a name=\"79p$1\"><\/a>\n");
@@ -252,17 +248,20 @@ function doIt(){
       re = /<a href="[#_\w]+"\sclass="back_to_[\w_]+">Back to Top<\/a>/g;
       body = body.replace(re, "");
 
-      //get rid of divs
-      re = /<div\s[\w="_\s]+>/g;
-      body = body.replace(re, "");
-      re = /<\/div>/g;
-      body = body.replace(re, "");
+      //find footnote divs and make links
+      re = /<div\sid="(footnote-[\d]+?)"[\w="_\s]+>/g;
+      body = body.replace(re, "<a name=\"$1\"><\/a>");
 
       //get rid of h1s
-      re = /<h1[\S\s]*?id=\"(\w\-\d+)\"[\S\s]*?>/g;
+      re = /<h1[\w="_\s]+?id=\"(\w\-\d+)\"[\w="_\s]+?>/g;
       body = body.replace(re, "<br><br><a name=\"$1\"><\/a><p>");
       re = /<\/h1>/g;
       body = body.replace(re, "<\/b><\/p>");
+      re = /<h1[\w="_\s]+?>/g;
+      body = body.replace(re, "<p><b>");
+      re = /<h1>/g;
+      body = body.replace(re, "<p><b>");
+
 
       //setup the different docs
 
@@ -301,11 +300,16 @@ function doIt(){
 
       //setup for Footnotes
       re = /<p><b>Footnotes/g;
-      replace = "\n<\/doc>\n<doc>\n:::date " + date +  "\n:::uid " + uid + "footnotes\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/globaltext.css\">\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/fedreg.css\">\n<h3>Footnotes<\/h3>\n";
+      replace = "\n<\/doc>\n<doc>\n:::date " + date +  "\n:::uid " + uid + "footnotes\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/globaltext.css\">\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/fedreg.css\">\n<h3>Footnotes<\/h3>\n<a name=\"footnotes\"><\/a>\n";
       body = body.replace(re, replace);
-      re = /<div[\s\w\d=_\-\"]+class="footnote">/g;
-      replace = "";
-      body = body.replace(re, replace);
+
+      //get rid of divs
+      re = /<div\s[\w="_\s]+>/g;
+      body = body.replace(re, "");
+      re = /<div>/g;
+      body = body.replace(re, "");
+      re = /<\/div>/g;
+      body = body.replace(re, "");
 
       //setup for List of Subjects
       re = /<p><b>List of Subjects/g;
@@ -344,10 +348,6 @@ function doIt(){
       replace = "<!!ln dp_fr$2 $1p$2 #$1p$2>";
       doc = doc.replace(re, replace);
 
-      re = /<a[\s\w\d\-\"#=]+rel=\"footnote\">([\s\n]+\[\d+\][\s\n]+)<\/a>/g;
-      replace = "\n$1\n";
-      doc = doc.replace(re, replace);
-
       //take care of any images
       re = /<p\sclass="graphic"><a[\s\w\"\-=]+href="https:\/\/s3\.amazonaws\.com\/images\.federalregister\.gov\/([A-Z0-9\.]+)\/\w+(\.\w{3})\"[\s\w\"\-=]+><img[\s\w\"\-=:\/\.]+><\/a><\/p>/g;
       replace = "<p class=\"graphic\"><!!img><img src=\"$1$2\"><\/a><\/p>";
@@ -357,10 +357,6 @@ function doIt(){
       re = /\sclass=\"([\w\d\-_\s]+)?\"/g;
       doc = doc.replace(re, "");
 
-      //change the alinks in headers
-      //re = /(<h\d>)<a\sname=\"(\w)-(\d+)\"><\/a>([\S\s]*?<\/h\d>)/g;
-      //replace = "$1$4\n<a name=\"" + FRVolume + edition + "$2$3\"><\/a>";
-      //doc = doc.replace(re, replace);
 
       //header id removal
       re = /(<h\d)\s[\w\s\d=\"]+>/g;
@@ -381,8 +377,6 @@ function doIt(){
         replace = "$1</p>";
         doc = doc.replace(re, replace);
       });
-
-
 
       //download the images we'll need
       var loadedFile = source;
