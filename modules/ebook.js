@@ -6,6 +6,7 @@ var xpath = require('xpath');
 var dom = require('xmldom').DOMParser;
 var cheerio = require('cheerio');
 var Peepub   = require('pe-epub');
+var getMatches = require('../modules/getMatches.js');
 
 var dateNow = function() {
   var dateNow = new Date();
@@ -23,15 +24,14 @@ function doIt(){
 
   //var collection = "mre_paige_test";
   //opps
-  var collection = "mre_pps_outpt2015";
-  //pfs
-  //var collection = "mre_pps_pfs2015";
-
+  //var collection = "mre_pps_outpt2015";
   //OPPS
-  var url = "https://www.federalregister.gov/articles/2014/11/10/2014-26146/medicare-and-medicaid-programs-hospital-outpatient-prospective-payment-and-ambulatory-surgical";
-  //PFS
-  //var url = "https://www.federalregister.gov/articles/2014/11/13/2014-26183/medicare-program-revisions-to-payment-policies-under-the-physician-fee-schedule-clinical-laboratory";
-  console.log("Downloading URL: " + url);
+  //var url = "https://www.federalregister.gov/articles/2014/11/10/2014-26146/medicare-and-medicaid-programs-hospital-outpatient-prospective-payment-and-ambulatory-surgical";
+  //pfs
+  var collection = "mre_pps_pfs2015";
+  var url = "https://www.federalregister.gov/articles/2014/11/13/2014-26183/medicare-program-revisions-to-payment-policies-under-the-physician-fee-schedule-clinical-laboratory";
+
+  console.log("Downloading For: " + collection + " URL:" + url);
   //write out what we're pulling down for testing purposes
   fs.writeFileSync("origional.html", url);
 
@@ -39,7 +39,6 @@ function doIt(){
     if(!error) {
       var $ = cheerio.load(html);
       var source = $('.article').html();
-
       var FRVolume = $('.volume').html();
       var edition = $('.page').html();
 
@@ -226,7 +225,7 @@ function doIt(){
       $('#content_area .table_of_tables').remove();
       $('#content_area #table_of_tables').remove();
       //remove the secondary ToC
-      $('#content_area .extract').remove();
+      //$('#content_area .extract').remove();
 
       //this is in the wrong stinking place
       var tableOfContents = "\n<doc>\n:::uid tableofcontents" + FRVolume + "\n<h3>Table of Contents</h3>" + toc + "\n<\/doc>";
@@ -292,7 +291,6 @@ function doIt(){
 
       //catpture the important h2s
       re = /<h2\sid=\"([\w\d\"\-\s=]+)\"[\w\d\"\-\s=]+\">([IVX]+\.[\S\s]*?)<\/h2>/g;
-
       replace = "\n<\/doc>\n<doc>\n:::uid " + uid + "$1\n<h3>$2<\/h3>\n<a name=\"$1\"><\/a>\n";
       body = body.replace(re, replace);
       //get rid of the others
@@ -368,12 +366,21 @@ function doIt(){
       re = /(<h\d)\s[\w\s\d=\"]+>/g;
       replace = "$1>";
       doc = doc.replace(re, replace);
-
+      
 
       //add in the toc
       re = /(<\/doc>)\n(<doc>\n:::uid\s[\w\d]+\n<h3>I\.[\w\d\s]+\n<\/h3>)/;
       replace = "$1\n" + tableOfContents + "\n$2";
       doc = doc.replace(re, replace);
+
+      //remove the links for h3s that are just folder level empty docs
+      re = /<h3>[\w\d\-\. \n\(\),:&#;]+<\/h3>\n<a name="([\d\w\-]+)"><\/a>[\s\n]+<\/doc>/ig;
+      matches =  getMatches(doc, re);
+      matches.forEach(function(value) {
+        re = new RegExp('<a href="#' + value + '">([\\s\\S]*?)<\\/a><\\/p>');
+        replace = "$1</p>";
+        doc = doc.replace(re, replace);
+      });
 
 
 
@@ -401,7 +408,7 @@ function doIt(){
       console.log("Done");
 
       //what is in the doc now
-      fs.writeFileSync("xpathTest.html", doc);
+      fs.writeFileSync(collection + ".html", doc);
       //console.log(doc);
   }
 });
