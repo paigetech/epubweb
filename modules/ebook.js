@@ -344,8 +344,9 @@ function doIt(){
       doc = doc.replace(re, "$1$2"); 
 
       //run the find and replace set
-      re = /<a href=\"\/citation\/(([\d]+)-FR-[\d]+)\">/g;
-      replace = "<!!ln dp_fr$2 $1p$2 #$1p$2>";
+
+      re = /<a href=\"\/citation\/(([\d]+)-FR-[\d]+)\">([\s\w\"\-=\n]+)<\/a>/g;
+      replace = "<!!ln dp_fr$2 $1p$2 #$1p$2>$3<\/!!ln>";
       doc = doc.replace(re, replace);
 
       //take care of any images
@@ -361,6 +362,11 @@ function doIt(){
       //header id removal
       re = /(<h\d)\s[\w\s\d=\"]+>/g;
       replace = "$1>";
+      doc = doc.replace(re, replace);
+
+      //replace the closing ln tages with the proper closing a tag 
+      re = /<\/!!ln>/g;
+      replace = "<\/a>";
       doc = doc.replace(re, replace);
       
 

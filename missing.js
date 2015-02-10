@@ -39,12 +39,15 @@ function doIt(url, articleName){
       var source = $('.article').html();
 
       var FRVolume = $('.volume').html();
+      console.log(FRVolume);
       var edition = $('.page').html();
+      console.log(edition);
 
       //building the doc
       var doc = "";
 
-      doc += url + "\n\n";
+      doc += url + "\n\n :::index " + FRVolume + "p" + edition + "\n\n";
+
 
       //date
       var dateBody = $('.metadata_list').html();
@@ -57,12 +60,16 @@ function doIt(url, articleName){
       
 
 
+
       //body info for the rest of the build
       var body = $('#content_area').html();
+      if (!body) {
+        console.log("error, content_area not found");
+      }
 
       //adding indexs and alinks
-      re = /<span\sclass="printed_page"\sid="page-(\d+)[\S\s]*?<\/span>/g;
-      body = body.replace(re, "\n:::index 79p$1\n<a name=\"79p$1\"><\/a>\n");
+      re = /<span[\s\S]+?class="printed_page"\sid="page-(\d+)[\S\s]*?<\/span>/g;
+      body = body.replace(re, "\n:::index " + FRVolume + "p$1\n<a name=\"" + FRVolume + "p$1\"><\/a>\n");
 
       //getting rid of back to top
       re = /<a href="[#_\w]+"\sclass="back_to_[\w_]+">Back to Top<\/a>/g;
@@ -80,23 +87,14 @@ function doIt(url, articleName){
       re = /<\/h\d>/g;
       body = body.replace(re, "<\/b><\/p>");
 
-
-
-      //setup for Footnotes
-      re = /<p><b>Footnotes/g;
-      replace = "\n<h3>Footnotes<\/h3>\n";
-      body = body.replace(re, replace);
-      re = /<div[\s\w\d=_\-\"]+class="footnote">/g;
-      replace = "";
-      body = body.replace(re, replace);
-
-
       //add the body to the prepared doc
       doc += body;
 
       //run the find and replace set
-      re = /<a href=\"\/citation\/(([\d]+)-FR-[\d]+)\">/g;
-      replace = "<!!ln dp_fr$2 $1p$2 #$1p$2>";
+
+      //convert FR links to rex links
+      re = /<a href=\"\/citation\/(([\d]+)-FR-[\d]+)\">([\s\w\"\-=\n]+)<\/a>/g;
+      replace = "<!!ln dp_fr$2 $1p$2 #$1p$2>$3<\/!!ln>";
       doc = doc.replace(re, replace);
 
       //get rid of any hrefs
@@ -126,6 +124,10 @@ function doIt(url, articleName){
       replace = "$1>";
       doc = doc.replace(re, replace);
 
+      //replace the closing ln tages with the proper closing a tag 
+      re = /<\/!!ln>/g;
+      replace = "<\/a>";
+      doc = doc.replace(re, replace);
 
 
       //download the images we'll need
