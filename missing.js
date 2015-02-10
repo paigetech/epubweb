@@ -6,6 +6,7 @@ var xpath = require('xpath');
 var dom = require('xmldom').DOMParser;
 var cheerio = require('cheerio');
 var Peepub   = require('pe-epub');
+var mkdirp = require('mkdirp');
 
 var dateNow = function() {
   var dateNow = new Date();
@@ -111,8 +112,9 @@ function doIt(url, articleName){
       doc = doc.replace(re, replace);
 
       //take care of any images
-      re = /<p\sclass="graphic"><a[\s\w\"\-=]+href="https:\/\/s3\.amazonaws\.com\/images\.federalregister\.gov\/([A-Z0-9\.]+)\/\w+(\.\w{3})\"[\s\w\"\-=]+><img[\s\w\"\-=:\/\.]+><\/a><\/p>/g;
-      replace = "<p class=\"graphic\"><!!img><img src=\"$1$2\"><\/a><\/p>";
+      re = /<img src="https:\/\/s3.amazonaws.com\/images\.federalregister\.gov\/([\s\S]+?)\/[\s\S]+?>/gi;
+      replace = "<!!img><img src=\"http://p.i.mediregs.com/fr" + FRVolume + "/$1\"><\/a><\/p>";
+
       doc = doc.replace(re, replace);
 
       //get rid of classes
@@ -135,6 +137,13 @@ function doIt(url, articleName){
 
       re = /src=\"(https:\/\/s\d\.amazonaws\.com\/images\.federalregister\.gov\/.*?\/\w+\.\w{3})\"/ig;
 
+      //make sure the frvolume directory is available
+      var directory = 'images/' + FRVolume + "/";
+      mkdirp( directory , function (err) {
+            if (err) console.error(err);
+            else console.log('Made the directory: ' + directory);
+      });
+
       var captures = [];
       while (match = re.exec(loadedFile)) {
             captures.push(match[1]);
@@ -145,7 +154,7 @@ function doIt(url, articleName){
           var re = /https:\/\/s\d\.amazonaws\.com\/images\.federalregister\.gov\/([\d\w\.]+)\/\w+\.\w{3}/ig;
           var fileVar = re.exec(url);
           if (fileVar) {
-            var fileName = "images/" + fileVar[1].toLowerCase() + '.png';
+            var fileName = "images/" + FRVolume + "/" + fileVar[1].toLowerCase() + '.png';
             request(url).pipe(fs.createWriteStream(fileName));
           }
 
