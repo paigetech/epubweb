@@ -22,12 +22,6 @@ var dateNow = function() {
 
 function doIt(url, articleName){
 
-  //var collection = "mre_paige_test";
-  //opps
-  var collection = "mre_pps_outpt2015";
-  //pfs
-  //var collection = "mre_pps_pfs2015";
-
   //var url = "https://www.federalregister.gov/articles/2010/12/30/2010-33169/recruiting-and-hiring-students-and-recent-graduates";
 
   console.log("Downloading URL: " + url);
@@ -40,9 +34,7 @@ function doIt(url, articleName){
       var source = $('.article').html();
 
       var FRVolume = $('.volume').html();
-      console.log(FRVolume);
       var edition = $('.page').html();
-      console.log(edition);
 
       //building the doc
       var doc = "";
@@ -58,7 +50,6 @@ function doIt(url, articleName){
         date = (res[1].replace(/[\/]/g, "-") );
       }
       var today = dateNow();
-      
 
 
 
@@ -111,12 +102,6 @@ function doIt(url, articleName){
       replace = "\n$1\n";
       doc = doc.replace(re, replace);
 
-      //take care of any images
-      re = /<img src="https:\/\/s3.amazonaws.com\/images\.federalregister\.gov\/([\s\S]+?)\/[\s\S]+?>/gi;
-      replace = "<!!img><img src=\"http://p.i.mediregs.com/fr" + FRVolume + "/$1\"><\/a><\/p>";
-
-      doc = doc.replace(re, replace);
-
       //get rid of classes
       re = /\sclass=\"([\w\d\-_\s]+)?\"/g;
       doc = doc.replace(re, "");
@@ -160,8 +145,22 @@ function doIt(url, articleName){
 
         });
       }
+
+      doc = doc.replace(/https:\/\/s\d\.amazonaws\.com\/images\.federalregister\.gov\/([a-z0-9\.%]+)\/\w+\.\w{3}/ig, function($1) {
+            return( $1.toLowerCase() ); 
+          });
+
+      var re = /https:\/\/s\d\.amazonaws\.com\/images\.federalregister\.gov\/([\d\w\.%]+)\/\w+\.\w{3}/ig;
+      var replace = "http://p.i.mediregs.com/fr" + FRVolume + "/$1.png\"><\/a><\/p>";
+      doc = doc.replace(re, replace);
+
+      //take care of any images
+      re = /<img src=/gi;
+      replace = "<!!img><img src=";
+      doc = doc.replace(re, replace);
+
       console.log('complete');
-     
+
       doc += "\n<\/doc>";
       console.log("Done");
 
@@ -174,7 +173,9 @@ function doIt(url, articleName){
 }
 
 var missing = [
-  "https://www.federalregister.gov/articles/2010/04/22/2010-9451/establishing-the-presidents-management-advisory-board",
+"https://www.federalregister.gov/articles/2015/02/04/2015-02226/notice-of-inventory-completion-california-state-university-sacramento-sacramento-ca",
+"https://www.federalregister.gov/articles/2015/02/09/2015-02179/energy-conservation-program-for-consumer-products-energy-conservation-standards-for-hearth-products",
+"https://www.federalregister.gov/articles/2010/04/22/2010-9451/establishing-the-presidents-management-advisory-board",
 "https://www.federalregister.gov/articles/2010/04/22/2010-9324/bureau-of-educational-and-cultural-affairs-eca-request-for-grant-proposals-dancemotion-usa",
 "https://www.federalregister.gov/articles/2010/08/23/2010-21020/establishment-of-pakistan-and-afghanistan-support-office",
 "https://www.federalregister.gov/articles/2010/08/23/2010-21016/classified-national-security-information-program-for-state-local-tribal-and-private-sector-entities",
