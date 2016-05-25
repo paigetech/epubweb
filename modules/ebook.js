@@ -7,6 +7,10 @@ var dom = require('xmldom').DOMParser;
 var cheerio = require('cheerio');
 var Peepub   = require('pe-epub');
 var getMatches = require('../modules/getMatches.js');
+var mkdirp = require('mkdirp');
+var myArgs = process.argv.slice(2);
+
+var url = "https://www.federalregister.gov/articles/2016/04/27/2016-09120/medicare-program-hospital-inpatient-prospective-payment-systems-for-acute-care-hospitals-and-the";
 
 var dateNow = function() {
   var dateNow = new Date();
@@ -20,17 +24,10 @@ var dateNow = function() {
   return (yy + '-' + mm + '-' + dd);
 };
 
-function doIt(){
+function doIt(url){
 
-  //opps
-  var collection = "mre_pps_outpt2015";
-  //OPPS
-  var url = "https://www.federalregister.gov/articles/2014/11/10/2014-26146/medicare-and-medicaid-programs-hospital-outpatient-prospective-payment-and-ambulatory-surgical";
-  //pfs
-  //var collection = "mre_pps_pfs2015";
-  //var url = "https://www.federalregister.gov/articles/2014/11/13/2014-26183/medicare-program-revisions-to-payment-policies-under-the-physician-fee-schedule-clinical-laboratory";
 
-  console.log("Downloading For: " + collection + " URL:" + url);
+  console.log("Downloading For: " + url);
   //write out what we're pulling down for testing purposes
   fs.writeFileSync("origional.html", url);
 
@@ -40,6 +37,7 @@ function doIt(){
       var source = $('.article').html();
       var FRVolume = $('.volume').html();
       var edition = $('.page').html();
+      var filename = FRVolume + "FR" + edition;
 
       //building the doc
       var doc = "";
@@ -126,18 +124,11 @@ function doIt(){
         doc += agencies + '\n';
 
         //Entry Type
-        re = /<dt>Entry\sType:<\/dt>\s+<dd>(\w+)<\/dd>/g;
+        re = /<dt>Entry\sType:<\/dt>[\n\s]+<dd>([\w\s]+)<\/dd>/g;
         var entryType = re.exec(summBody)[1];
         entryType = "\n<br><p><b>Entry Type:</b> " + entryType + "</p>\n";
 
         doc += entryType + '\n';
-
-        //Action
-        re = /<dt>Action:\s?<\/dt>\s+<dd>([\w\s\.]+)<\/dd>/g;
-        var action = re.exec(summBody)[1];
-        action = "<br><p><b>Action:</b> " + action + "</p>\n";
-
-        doc += action + '\n';
 
         //Document Citation
         re = /<dt>Document Citation.*?\n.*?(\d\d).*?(\d+)<\/span>/g;
@@ -181,15 +172,17 @@ function doIt(){
         //setup the short title
         var shortTitle = matches;
         re = /CMS-\d+-(\w+)/g;
-        var extension = re.exec(shortTitle)[1];
+        var extension = re.exec(shortTitle);
         if (extension === "FC") {
           shortTitle += " Final Rule for 2015 OPPS & ASC";
         } else if (extension === "P") {
           shortTitle += " Proposed Rule for 2015 OPPS & ASC";
         }
+        
 
         //we now have the info to build the h2
-        var h2 = "<doc>\n<h2>" + shortTitle + "</h2>\n:::uid " + uid + "0\n</doc>\n";
+        //we set it to an h1 until the end, when we change it back to h2
+        var h2 = "<doc>\n<h1>" + shortTitle + "</h1>\n:::uid " + uid + "0\n</doc>\n";
 
         doc = h2 + doc;
 
@@ -236,6 +229,14 @@ function doIt(){
       tableOfContents = tableOfContents.replace(re, "<p ");
       re = /<\/li>/g;
       tableOfContents = tableOfContents.replace(re, "<\/p>");
+      //setup the classes for indentation
+      re = /class="level_2"/g;
+      tableOfContents = tableOfContents.replace(re, "class=\"levela\"");
+      re = /class="level_3"/g;
+      tableOfContents = tableOfContents.replace(re, "class=\"levelb\"");
+      re = /class="level_4"/g;
+      tableOfContents = tableOfContents.replace(re, "class=\"levelc\"");
+
 
       //body info for the rest of the build
       var body = $('#content_area').html();
@@ -253,14 +254,28 @@ function doIt(){
       body = body.replace(re, "<a name=\"$1\"><\/a>");
 
       //get rid of h1s
-      re = /<h1[\w="_\s]+?id=\"(\w\-\d+)\"[\w="_\s]+?>/g;
+      re = /<h1[\w="_\s-]+?id=\"(\w\-\d+)\"[\w="_\s-]+?>/g;
       body = body.replace(re, "<br><br><a name=\"$1\"><\/a><p>");
+      re = /<h1[ \w="_\s-]+?id=\"([\w\-\d]+)\">/g;
+      body = body.replace(re, "<br><br><a name=\"$1\"><\/a><p>");
+      re = /<h1[\w="_\s-]+?>/g;
+      body = body.replace(re, "<p><b>");
       re = /<\/h1>/g;
       body = body.replace(re, "<\/b><\/p>");
-      re = /<h1[\w="_\s]+?>/g;
-      body = body.replace(re, "<p><b>");
       re = /<h1>/g;
       body = body.replace(re, "<p><b>");
+
+      //get rid of h3s in List of Subjects
+      re = /<h3 class="cfr_section".*?>(.*?)<\/h3>/g;
+      body = body.replace(re, "<p><b>$1<\/p><\/b>");
+
+      //new cleanups
+      re = /<caption id=\"t\-(\d)\">/g;
+      body = body.replace(re, "<a name=\"t\-$1\">");
+
+      re = /<table>/g;
+      body = body.replace(re, "<table class=\"fr\">");
+
 
 
       //setup the different docs
@@ -297,10 +312,39 @@ function doIt(){
       replace = "\n<p><b>$2<\/b><\/p>\n<a name=\"$1\"><\/a>\n";
       body = body.replace(re, replace);
 
+      //clean up random h2
+      re = /<h2([\s\w\d=\"_]+)?><\/h2>/g;
+      body = body.replace(re, "");
+
+      //sec h2's <h2 id="sec-410-29">
+      re = /<h2\sid=\"[\w\d\"\-\s=]+\">([\S\s]*?)<\/h2>/g;
+      replace = "\n<p><b>$1<\/b><\/p>\n";
+      body = body.replace(re, replace);
+
+      re = /<h2/g;
+      body = body.replace(re, "<h3");
+      re = /<\/h2>/g;
+      body = body.replace(re, "<\/h3>");
 
       //setup for Footnotes
       re = /<p><b>Footnotes/g;
       replace = "\n<\/doc>\n<doc>\n:::date " + date +  "\n:::uid " + uid + "footnotes\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/globaltext.css\">\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://portal.mediregs.com/fedreg.css\">\n<h3>Footnotes<\/h3>\n<a name=\"footnotes\"><\/a>\n";
+      body = body.replace(re, replace);
+      //fix the footnotes
+      re = /<sup><a rel="footnote" id="(citation-\d+)"/g;
+      replace = "<sup><a rel=\"footnote\" name=\"$1\"";
+      body = body.replace(re, replace);
+
+      //level tags
+      //<a name="h-35"></a><br><p><b>1. **indicates level a** Database Construction</b></p>
+      //</a><br><p class="levela"><i>1. Database Construction</i></p>
+      re = /<\/a><br><p><b>(\d{1,3}\. )/g;
+      replace = "</a><br><p class=\"levela\"><i>$1";
+      body = body.replace(re, replace);
+      //</a><br><p><b>a. **indicates level b** Database Source and Methodology</b></p>
+      //             To:           <a name="h-36"></a><br><p class="levelb"><i>a. Dat
+      re = /<\/a><br><p><b>([a-z]{1,3}\. )/g;
+      replace = "</a><br><p class=\"levelb\"><i>$1";
       body = body.replace(re, replace);
 
       //get rid of divs
@@ -331,12 +375,10 @@ function doIt(){
       re = /<\/doc>\n+<\/doc>/g;
       body = body.replace(re, "<\/doc>");
 
-      //clean up random h2
-      re = /<h2([\s\w\d=\"_]+)?><\/h2>/g;
-      body = body.replace(re, "");
 
       //add the toc
-      //doc += tableOfContents;
+      doc += tableOfContents;
+
       //add the body to the prepared doc
       doc += body;
       //fix uids
@@ -354,10 +396,6 @@ function doIt(){
       replace = "<p class=\"graphic\"><!!img><img src=\"$1$2\"><\/a><\/p>";
       doc = doc.replace(re, replace);
 
-      //get rid of classes
-      re = /\sclass=\"([\w\d\-_\s]+)?\"/g;
-      doc = doc.replace(re, "");
-
 
       //header id removal
       re = /(<h\d)\s[\w\s\d=\"]+>/g;
@@ -368,21 +406,23 @@ function doIt(){
       re = /<\/!!ln>/g;
       replace = "<\/a>";
       doc = doc.replace(re, replace);
-      
 
-      //add in the toc
-      re = /(<\/doc>)\n(<doc>\n:::uid\s[\w\d]+\n<h3>I\.[\w\d\s]+\n<\/h3>)/;
-      replace = "$1\n" + tableOfContents + "\n$2";
+      //pull out page numbers
+      re = /<span[ \w="_\s-]+?data-page=\"([\w\-\d]+)\"[ \w="_\s-]+?> <\/span>/g;
+      matches = doc.match(re);
+      if (matches !== null) {
+        matches.forEach(function(value) {
+          re = new RegExp('<a href="#' + value + '">([\\s\\S]*?)<\\/a><\\/p>');
+          replace = "$1</p>";
+          doc = doc.replace(re, replace);
+        });
+      }
+      
+      //change h1 to h2 for final process
+      re = /h1>/g;
+      replace = "h2>";
       doc = doc.replace(re, replace);
 
-      //remove the links for h3s that are just folder level empty docs
-      re = /<h3>[\w\d\-\. \n\(\),:&#;]+<\/h3>\n<a name="([\d\w\-]+)"><\/a>[\s\n]+<\/doc>/ig;
-      matches =  getMatches(doc, re);
-      matches.forEach(function(value) {
-        re = new RegExp('<a href="#' + value + '">([\\s\\S]*?)<\\/a><\\/p>');
-        replace = "$1</p>";
-        doc = doc.replace(re, replace);
-      });
 
       //download the images we'll need
       var loadedFile = source;
@@ -393,6 +433,10 @@ function doIt(){
       while (match = re.exec(loadedFile)) {
             captures.push(match[1]);
       }
+      mkdirp( "images/", function (err) {
+            if (err) console.error(err);
+            else console.log('Made the directory images/');
+      });
 
       captures.forEach(function(url) {
         var re = /https:\/\/s\d\.amazonaws\.com\/images\.federalregister\.gov\/([\d\w\.]+)\/\w+\.\w{3}/ig;
@@ -407,13 +451,12 @@ function doIt(){
       doc += "\n<\/doc>";
       console.log("Done");
 
-      //what is in the doc now
-      fs.writeFileSync(collection + ".html", doc);
-      //console.log(doc);
+      fs.writeFileSync(filename + ".html", doc);
+      console.log("Wrote: " + filename);
   }
 });
 
 }
 
-doIt();
+doIt(url);
 

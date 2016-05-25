@@ -1,0 +1,13 @@
+{
+  "name": "missing",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "cheerio": "^0.18.0",
+    "mkdirp": "^0.5.0",
+    "pe-epub": "^0.3.7",
+    "q": "^1.1.1",
+    "request": "^2.48.0",
+    "xpath": "0.0.7"
+  }
+}
