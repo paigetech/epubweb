@@ -265,9 +265,6 @@ function doIt(url){
       re = /<h1>/g;
       body = body.replace(re, "<p><b>");
 
-      //get rid of h3s in List of Subjects
-      re = /<h3 class="cfr_section".*?>(.*?)<\/h3>/g;
-      body = body.replace(re, "<p><b>$1<\/p><\/b>");
 
       //new cleanups
       re = /<caption id=\"t\-(\d)\">/g;
@@ -338,13 +335,13 @@ function doIt(url){
       //level tags
       //<a name="h-35"></a><br><p><b>1. **indicates level a** Database Construction</b></p>
       //</a><br><p class="levela"><i>1. Database Construction</i></p>
-      re = /<\/a><br><p><b>(\d{1,3}\. )/g;
-      replace = "</a><br><p class=\"levela\"><i>$1";
+      re = /<\/a><br><p><b>(\d{1,3}\. )<\/b>/g;
+      replace = "</a><br><p class=\"levela\"><i>$1</i>";
       body = body.replace(re, replace);
       //</a><br><p><b>a. **indicates level b** Database Source and Methodology</b></p>
       //             To:           <a name="h-36"></a><br><p class="levelb"><i>a. Dat
-      re = /<\/a><br><p><b>([a-z]{1,3}\. )/g;
-      replace = "</a><br><p class=\"levelb\"><i>$1";
+      re = /<\/a><br><p><b>([a-z]{1,3}\. )<\/b>/g;
+      replace = "</a><br><p class=\"levelb\"><i>$1</i>";
       body = body.replace(re, replace);
 
       //get rid of divs
@@ -387,8 +384,8 @@ function doIt(url){
 
       //run the find and replace set
 
-      re = /<a href=\"\/citation\/(([\d]+)-FR-[\d]+)\">([\s\w\"\-=\n]+)<\/a>/g;
-      replace = "<!!ln dp_fr$2 $1p$2 #$1p$2>$3<\/!!ln>";
+      re = /<a href=\"\/citation\/([\d]+)-FR-([\d]+)\">([\s\w\"\-=\n]+)<\/a>/g;
+      replace = "<!!ln dp_fr$1 $1p$2 #$1p$2>$3<\/!!ln>";
       doc = doc.replace(re, replace);
 
       //take care of any images
@@ -417,6 +414,43 @@ function doIt(url){
           doc = doc.replace(re, replace);
         });
       }
+
+      //additional changes 5.25.2016
+
+      //get rid of h3s in List of Subjects
+      console.log("new section is running");
+      re = /<h3 class="cfr_section".*?>(.*?)<\/h3>/g;
+      doc = doc.replace(re, "<p><b>$1<\/p><\/b>");
+
+      re = /<caption class="table_title" id="t\-(\d+)">/g;
+      doc = doc.replace(re, '<caption class="table_title"><a name="t-$1"></a>');
+
+
+      //may also need to run this on the body
+      re = /<a class="cfr external".*?>((\d+) CFR (?:part )?(\d+)\.?(\d+)?)<\/a>/gi;
+      doc = doc.replace(re, '<!ln dp_ecfr$2 $2cfr$3x$4>$1</a>');
+
+      //replace href with hrex and add target="_blank"
+      re = /<a href="http:/gi;
+      doc = doc.replace(re, '<a target="_blank" hrex="http:');
+
+      //replace class="level[\w]" with level[\d]
+      re = /<p class="levela"/gi;
+      doc = doc.replace(re, '<p class="level1"');
+      re = /<p class="levelb"/gi;
+      doc = doc.replace(re, '<p class="level2"');
+      re = /<p class="levelc"/gi;
+      doc = doc.replace(re, '<p class="level3"');
+      re = /<p class="leveld"/gi;
+      doc = doc.replace(re, '<p class="level4"');
+
+      //add back to top in sections with captial letters
+      re = /(<h4><a name="([\w\d\-]+)"><\/a>[A-Z]\..*?<\/h4>)/gi;
+      doc = doc.replace(re, '$1\n<p><a href="#table_of_contents">Back to TOC</a></p>');
+
+
+
+      //end new changes
       
       //change h1 to h2 for final process
       re = /h1>/g;
